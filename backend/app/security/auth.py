@@ -1,3 +1,4 @@
+import hashlib
 import secrets
 from datetime import datetime, timedelta, timezone
 
@@ -11,11 +12,13 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def hash_api_key(key: str) -> str:
-    return pwd_context.hash(key)
+    key_hash = hashlib.sha256(key.encode()).hexdigest()
+    return pwd_context.hash(key_hash)
 
 
 def verify_api_key(plain_key: str, hashed_key: str) -> bool:
-    return pwd_context.verify(plain_key, hashed_key)
+    key_hash = hashlib.sha256(plain_key.encode()).hexdigest()
+    return pwd_context.verify(key_hash, hashed_key)
 
 
 def generate_api_key() -> str:
