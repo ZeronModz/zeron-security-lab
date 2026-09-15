@@ -3,7 +3,7 @@ import time
 import httpx
 import structlog
 
-from app.adapters.ua_adapter import get_random_headers
+from app.adapters.ua_adapter import get_random_headers, generate_user_agent
 from app.core.config import get_settings
 from app.security.validation import validate_url, ValidationError
 
