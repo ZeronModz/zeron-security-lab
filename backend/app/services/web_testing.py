@@ -102,7 +102,7 @@ class WebTestingService:
                     "redirect_chain": redirect_chain,
                     "cookies": dict(response.cookies),
                     "security_headers": security,
-                    "used_user_agent": headers.get("User-Agent", ""),
+                    "used_user_agent": headers.get("user-agent") or headers.get("User-Agent", ""),
                     "client_hints_sent": {k: v for k, v in headers.items() if k.startswith("sec-ch-ua")},
                 }
 
