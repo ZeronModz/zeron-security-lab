@@ -55,9 +55,11 @@ data class WebFetchResponseData(
     val response_time_ms: Int,
     val headers: Map<String, String>,
     val body: String,
-    val redirect_chain: List<String> = emptyList(),
+    val redirect_chain: List<Map<String, String>> = emptyList(),
     val cookies: Map<String, String> = emptyMap(),
-    val security_headers: Map<String, String?> = emptyMap()
+    val security_headers: Map<String, String?> = emptyMap(),
+    val used_user_agent: String? = null,
+    val client_hints_sent: Map<String, String> = emptyMap()
 )
 
 @Serializable
