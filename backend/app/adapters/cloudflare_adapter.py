@@ -31,13 +31,16 @@ class CloudflareAdapter:
 
     async def health_check(self) -> dict:
         try:
-            response = await self.client.get(f"{self.server_url}/")
+            response = await self.client.get(f"{self.server_url}/cookies", params={"url": "https://example.com"})
+            data = response.json()
+            is_cf_server = "cookies" in data or "user_agent" in data
             return {
-                "available": response.status_code == 200,
+                "available": is_cf_server,
                 "server_url": self.server_url,
                 "version": "2.0",
                 "engine": "cloakbrowser",
-                "status": "healthy" if response.status_code == 200 else "degraded",
+                "status": "healthy" if is_cf_server else "unavailable",
+                "note": None if is_cf_server else "CloudflareBypassForScraping server not running on this host.",
             }
         except Exception as e:
             return {
@@ -47,8 +50,7 @@ class CloudflareAdapter:
                 "engine": "cloakbrowser",
                 "status": "unavailable",
                 "error": str(e),
-                "note": "Cloudflare bypass requires a Linux server with CloakBrowser. "
-                "Deploy the backend on Railway or a VPS with the full browser stack.",
+                "note": "Cloudflare bypass requires CloudflareBypassForScraping server running on the same host.",
             }
 
     async def test_url(self, url: str, proxy: str | None = None, timeout: int | None = None) -> dict:
