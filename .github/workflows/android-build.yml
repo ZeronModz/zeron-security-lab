@@ -3,10 +3,8 @@ name: Android Build
 on:
   push:
     branches: [main]
-    paths: ['android/**']
   pull_request:
     branches: [main]
-    paths: ['android/**']
 
 jobs:
   build:
@@ -35,10 +33,6 @@ jobs:
 
       - name: Accept Android SDK License
         run: yes | sdkmanager --licenses || true
-
-      - name: Install Android SDK Components
-        run: |
-          sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"
 
       - name: Grant execute permission for gradlew
         run: chmod +x android/gradlew
