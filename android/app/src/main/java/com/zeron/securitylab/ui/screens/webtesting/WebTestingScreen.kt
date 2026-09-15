@@ -152,7 +152,7 @@ fun WebTestingScreen() {
                         value = headers,
                         onValueChange = { headers = it },
                         label = { Text("Headers (JSON)") },
-                        placeholder = { Text('{"Authorization": "Bearer ..."}') },
+                        placeholder = { Text("{\"Authorization\": \"Bearer ...\"}") },
                         modifier = Modifier.fillMaxWidth(),
                         minLines = 2,
                         colors = OutlinedTextFieldDefaults.colors(

@@ -166,7 +166,7 @@ fun ApiTestingScreen() {
                                 value = headers,
                                 onValueChange = { headers = it },
                                 label = { Text("Headers (JSON)") },
-                                placeholder = { Text('{"Content-Type": "application/json"}') },
+                                placeholder = { Text("{\"Content-Type\": \"application/json\"}") },
                                 modifier = Modifier.fillMaxWidth(),
                                 minLines = 3,
                                 colors = OutlinedTextFieldDefaults.colors(
@@ -180,7 +180,7 @@ fun ApiTestingScreen() {
                                 value = body,
                                 onValueChange = { body = it },
                                 label = { Text("Request Body") },
-                                placeholder = { Text('{"key": "value"}') },
+                                placeholder = { Text("{\"key\": \"value\"}") },
                                 modifier = Modifier.fillMaxWidth(),
                                 minLines = 5,
                                 colors = OutlinedTextFieldDefaults.colors(
