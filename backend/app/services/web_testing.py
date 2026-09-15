@@ -3,7 +3,7 @@ import time
 import httpx
 import structlog
 
-from app.adapters.ua_adapter import get_random_headers, generate_user_agent
+from app.adapters.ua_adapter import get_random_headers
 from app.core.config import get_settings
 from app.security.validation import validate_url, ValidationError
 
@@ -92,10 +92,6 @@ class WebTestingService:
                 elapsed_ms = int((time.time() - start) * 1000)
                 headers_dict = dict(response.headers)
                 security = {h: headers_dict.get(h) for h in SECURITY_HEADERS}
-
-                ua_info = None
-                if not request.headers and not request.user_agent:
-                    ua_info = generate_user_agent()
 
                 return {
                     "url": str(response.url),

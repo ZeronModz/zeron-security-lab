@@ -22,10 +22,7 @@ class ApiTestingService:
     async def send_request(self, request) -> dict:
         validate_url(request.url)
 
-        if request.headers:
-            headers = dict(request.headers)
-        else:
-            headers = get_api_headers()
+        headers = dict(request.headers) if request.headers else get_api_headers()
 
         if request.auth_type and request.auth_value:
             if request.auth_type == "bearer":
