@@ -111,7 +111,7 @@ async def test_api_request_private_ip(client):
 
 
 @pytest.mark.asyncio
-async def test.cloudflare_health(client):
+async def test_cloudflare_health(client):
     response = await client.get("/api/v1/cloudflare/health")
     assert response.status_code == 200
     data = response.json()
@@ -120,6 +120,7 @@ async def test.cloudflare_health(client):
 
 @pytest.mark.asyncio
 async def test_recaptcha_health(client):
+
     response = await client.get("/api/v1/recaptcha/health")
     assert response.status_code == 200
     data = response.json()
