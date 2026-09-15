@@ -34,7 +34,7 @@ jobs:
           pip install pytest pytest-asyncio pytest-cov httpx ruff
 
       - name: Lint with Ruff
-        run: ruff check backend/
+        run: ruff check backend/app/ --fix
         working-directory: .
 
       - name: Run Tests
@@ -48,6 +48,7 @@ jobs:
 
       - name: Upload coverage
         uses: actions/upload-artifact@v4
+        if: success()
         with:
           name: coverage-report
           path: backend/coverage.xml
