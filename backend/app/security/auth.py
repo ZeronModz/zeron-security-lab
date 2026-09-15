@@ -3,22 +3,18 @@ import secrets
 from datetime import datetime, timedelta, timezone
 
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 
 from app.core.config import get_settings
 
 settings = get_settings()
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def hash_api_key(key: str) -> str:
-    key_hash = hashlib.sha256(key.encode()).hexdigest()
-    return pwd_context.hash(key_hash)
+    return hashlib.sha256(key.encode()).hexdigest()
 
 
 def verify_api_key(plain_key: str, hashed_key: str) -> bool:
-    key_hash = hashlib.sha256(plain_key.encode()).hexdigest()
-    return pwd_context.verify(key_hash, hashed_key)
+    return hashlib.sha256(plain_key.encode()).hexdigest() == hashed_key
 
 
 def generate_api_key() -> str:
