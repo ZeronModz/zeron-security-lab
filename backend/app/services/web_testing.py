@@ -3,6 +3,7 @@ import time
 import httpx
 import structlog
 
+from app.adapters.ua_adapter import get_random_headers, generate_user_agent
 from app.core.config import get_settings
 from app.security.validation import validate_url, ValidationError
 
@@ -33,6 +34,28 @@ class WebTestingService:
     async def fetch(self, request) -> dict:
         validate_url(request.url)
 
+        if request.user_agent:
+            ua_data = generate_user_agent(
+                device=request.ua_device or "desktop",
+                browser=request.ua_browser or ["chrome", "edge"],
+            )
+            headers = ua_data["headers"].copy()
+            headers["User-Agent"] = request.user_agent
+        elif request.headers:
+            headers = dict(request.headers)
+        else:
+            headers = get_random_headers()
+
+        headers.setdefault("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8")
+        headers.setdefault("Accept-Language", "en-US,en;q=0.9")
+        headers.setdefault("Accept-Encoding", "gzip, deflate, br")
+        headers.setdefault("Connection", "keep-alive")
+        headers.setdefault("Upgrade-Insecure-Requests", "1")
+        headers.setdefault("Sec-Fetch-Dest", "document")
+        headers.setdefault("Sec-Fetch-Mode", "navigate")
+        headers.setdefault("Sec-Fetch-Site", "none")
+        headers.setdefault("Sec-Fetch-User", "?1")
+
         start = time.time()
         redirect_chain = []
         current_url = request.url
@@ -43,14 +66,17 @@ class WebTestingService:
                 response = await self.client.request(
                     method=request.method.value,
                     url=current_url,
-                    headers=request.headers or {},
+                    headers=headers,
                     cookies=request.cookies or {},
                     content=request.body,
                     follow_redirects=False,
                 )
 
                 if response.status_code in (301, 302, 303, 307, 308):
-                    redirect_chain.append(current_url)
+                    redirect_chain.append({
+                        "url": current_url,
+                        "status": response.status_code,
+                    })
                     location = response.headers.get("location", "")
                     if not location:
                         break
@@ -67,6 +93,10 @@ class WebTestingService:
                 headers_dict = dict(response.headers)
                 security = {h: headers_dict.get(h) for h in SECURITY_HEADERS}
 
+                ua_info = None
+                if not request.headers and not request.user_agent:
+                    ua_info = generate_user_agent()
+
                 return {
                     "url": str(response.url),
                     "status_code": response.status_code,
@@ -76,6 +106,8 @@ class WebTestingService:
                     "redirect_chain": redirect_chain,
                     "cookies": dict(response.cookies),
                     "security_headers": security,
+                    "used_user_agent": headers.get("User-Agent", ""),
+                    "client_hints_sent": {k: v for k, v in headers.items() if k.startswith("sec-ch-ua")},
                 }
 
             except httpx.TimeoutException:
@@ -88,6 +120,9 @@ class WebTestingService:
     async def render(self, request) -> dict:
         validate_url(request.url)
 
+        headers = get_random_headers()
+        headers.setdefault("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+
         start = time.time()
         try:
             async with httpx.AsyncClient(
@@ -95,7 +130,7 @@ class WebTestingService:
             ) as client:
                 response = await client.get(
                     request.url,
-                    headers={"User-Agent": "ZeronSecurityLab/1.0"},
+                    headers=headers,
                 )
 
                 elapsed_ms = int((time.time() - start) * 1000)

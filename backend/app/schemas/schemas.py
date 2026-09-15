@@ -57,6 +57,9 @@ class WebFetchRequest(BaseModel):
     timeout: int = Field(default=30, ge=1, le=120)
     follow_redirects: bool = True
     verify_ssl: bool = True
+    user_agent: str | None = Field(default=None, max_length=500)
+    ua_device: str | None = Field(default="desktop", max_length=20)
+    ua_browser: str | None = Field(default=None, max_length=50)
 
 
 class WebFetchResponse(BaseModel):
@@ -65,9 +68,11 @@ class WebFetchResponse(BaseModel):
     response_time_ms: int
     headers: dict[str, str]
     body: str
-    redirect_chain: list[str] = Field(default_factory=list)
+    redirect_chain: list[dict] = Field(default_factory=list)
     cookies: dict[str, str] = Field(default_factory=dict)
     security_headers: dict[str, str | None] = Field(default_factory=dict)
+    used_user_agent: str | None = None
+    client_hints_sent: dict[str, str] = Field(default_factory=dict)
 
 
 class WebRenderRequest(BaseModel):

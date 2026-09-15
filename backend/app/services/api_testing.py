@@ -4,6 +4,7 @@ import time
 import httpx
 import structlog
 
+from app.adapters.ua_adapter import get_api_headers
 from app.core.config import get_settings
 from app.security.validation import validate_url, ValidationError
 
@@ -21,7 +22,10 @@ class ApiTestingService:
     async def send_request(self, request) -> dict:
         validate_url(request.url)
 
-        headers = dict(request.headers) if request.headers else {}
+        if request.headers:
+            headers = dict(request.headers)
+        else:
+            headers = get_api_headers()
 
         if request.auth_type and request.auth_value:
             if request.auth_type == "bearer":
